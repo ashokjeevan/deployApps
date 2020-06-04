@@ -1,0 +1,25 @@
+Resources:
+  VPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: '<s3 base yaml url>'
+      TimeoutInMinutes: '5'
+
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !GetAtt VPCStack.Outputs.SelectedAMI
+      SecurityGroupIds:
+        - !GetAtt VPCStack.Outputs.PublicSecGroup
+      SubnetId: !GetAtt VPCStack.Outputs.PublicSubnetId
+      KeyName: !GetAtt VPCStack.Outputs.KeyPairName
+      Tags:
+        - Key: Name
+          Value: Web Server
+  
+Outputs:
+  OutputFromVPCStack:
+    Value: !GetAtt VPCStack.Outputs.VPCId
+  EC2InstancePublicIP:
+      Value: !Ref MyEC2Instance
